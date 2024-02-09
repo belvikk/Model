@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Модель движения заряженной частицы в электромагнитном поле</title>
+    <script src="scripts/jquery-3.7.1.min.js"></script>
+    <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@v0.149.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@v0.149.0/examples/jsm/"
+    }
+  }
+</script>
+    <!--
+    <script src="https://cdn.skypack.dev/pin/three@v0.132.2-dLPTyDAYt6rc6aB18fLm/mode=imports/optimized/three.js"></script>
+    -->
+</head>
+<style>
+    html, body{
+        margin:0;
+        width:100%;
+        height:100%;
+        overflow: hidden;
+        flex-direction: row;
+    }
+    #params {
+        float: left;
+        width:30%;
+        height:100%;
+        background-color: aqua;
+    }
+    #canvas {
+        float: left;
+        width:70%;
+        height:100%;
+    }
+</style>
+<script type="module">
+    import * as THREE from 'three';
+    import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+
+    $(function() {
+
+        $("#start").on("click",function() {
+            const t = $("#t").val();
+            //alert(t);
+            const B = $("#B").val();
+            //alert(B);
+            const E = $("#E").val();
+            //alert(E);
+            const q = $("#q").val();
+            //alert(q);
+            const Vx = $("#Vx").val();
+            //alert(Vx);
+            const Vy = $("#Vy").val();
+            //alert(Vy);
+            const Vz = $("#Vz").val();
+            //alert(Vz);
+            const X0 = $("#X0").val();
+            //alert(X0);
+            const Y0 = $("#Y0").val();
+            //alert(Y0);
+            const Z0 = $("#Z0").val();
+            //alert(Z0);
+
+            console.log(t,B,E,q,Vx,Vy,Vz,X0,Y0,Z0);
+
+
+
+
+        });
+
+        const scene = new THREE.Scene();
+
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        $("#canvas")[0].appendChild( renderer.domElement );
+
+        const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+        const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+        const cube = new THREE.Mesh( geometry, material );
+        scene.add( cube );
+
+        camera.position.z = 5;
+
+        const controls = new ArcballControls( camera, renderer.domElement, scene );
+
+        controls.addEventListener( 'change', function () {
+
+            renderer.render( scene, camera );
+
+        } );
+
+        function animate() {
+            requestAnimationFrame( animate );
+            renderer.render( scene, camera );
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+        }
+        animate();
+/*
+        //alert("Ready");
+        const canvas = $('#canvas')[0];
+        const context = canvas.getContext("2d");
+        context.fillStyle="red";
+        context.rect(10, 10, 40, 40);
+        context.fill();
+*/
+
+    });
+
+</script>
+<body>
+<div id="params">
+    <table>
+        <tr><td>t:</td><td><input id="t" value="10"></input></td></tr>
+        <tr><td>B:</td><td><input id="B"></input></td></tr>
+        <tr><td>E:</td><td><input id="E"></input></td></tr>
+        <tr><td>q:</td><td><input id="q"></input></td></tr>
+    </table>
+    <table>
+        <tr><td>Vx:</td><td><input id="Vx" size="5"></input></td>
+        <td>Vy:</td><td><input id="Vy" size="5"></input></td>
+            <td>Vz:</td><td><input id="Vz" size="5"></input></td></tr>
+        <tr><td>X0:</td><td><input id="X0" size="5"></input></td>
+            <td>Y0:</td><td><input id="Y0" size="5"></input></td>
+            <td>Z0:</td><td><input id="Z0" size="5"></input></td></tr>
+    </table>
+
+        <button type="button" id="start">Запуск</button>
+
+</div>
+<div id="canvas">
+
+</div>
+</body>
+</html>
