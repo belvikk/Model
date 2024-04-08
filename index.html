@@ -28,7 +28,7 @@
         float: left;
         width:30%;
         height:100%;
-        background-color: aqua;
+        background-color: #d6d6d6;
     }
     #canvas {
         float: left;
@@ -38,70 +38,148 @@
 </style>
 <script type="module">
     import * as THREE from 'three';
-    import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+    //import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+    import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+    import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
 
     $(function() {
 
-        $("#start").on("click",function() {
-            const t = $("#t").val();
-            //alert(t);
-            const B = $("#B").val();
-            //alert(B);
-            const E = $("#E").val();
-            //alert(E);
-            const q = $("#q").val();
-            //alert(q);
-            const Vx = $("#Vx").val();
-            //alert(Vx);
-            const Vy = $("#Vy").val();
-            //alert(Vy);
-            const Vz = $("#Vz").val();
-            //alert(Vz);
-            const X0 = $("#X0").val();
-            //alert(X0);
-            const Y0 = $("#Y0").val();
-            //alert(Y0);
-            const Z0 = $("#Z0").val();
-            //alert(Z0);
+            $("#start").on("click", function () {
+                const t = $("#t").val();
+                //alert(t);
+                const B = $("#B").val();
+                //alert(B);
+                const E = $("#E").val();
+                //alert(E);
+                const q = $("#q").val();
+                //alert(q);
+                const Vx = $("#Vx").val();
+                //alert(Vx);
+                const Vy = $("#Vy").val();
+                //alert(Vy);
+                const Vz = $("#Vz").val();
+                //alert(Vz);
+                const X0 = $("#X0").val();
+                //alert(X0);
+                const Y0 = $("#Y0").val();
+                //alert(Y0);
+                const Z0 = $("#Z0").val();
+                //alert(Z0);
 
-            console.log(t,B,E,q,Vx,Vy,Vz,X0,Y0,Z0);
-
-
+                console.log(t, B, E, q, Vx, Vy, Vz, X0, Y0, Z0);
 
 
-        });
+            });
 
-        const scene = new THREE.Scene();
+            function line(p1, p2) {
+                const material = new THREE.LineBasicMaterial({color: 0xffffff});
+                const points = [];
+                points.push(p1);
+                points.push(p2);
+                return new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), material);
+            }
 
-        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            function text(p, t) {
+                const textGeometry = new TextGeometry(t, {
+                        size: 80,
+                        depth: 5,
+                        curveSegments: 12,
+                        bevelEnabled: true,
+                        bevelThickness: 10,
+                        bevelSize: 8,
+                        bevelOffset: 0,
+                        bevelSegments: 5
+                    });
 
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        $("#canvas")[0].appendChild( renderer.domElement );
+                const materials = [
+                    new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+                    new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+                ];
 
-        const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-        const cube = new THREE.Mesh( geometry, material );
-        scene.add( cube );
+                const text = new THREE.Mesh(textGeometry, materials);
+                text.position.x = p.x;
+                text.position.y = p.y;
+                text.position.z = p.z;
+                return text;
+            }
 
-        camera.position.z = 5;
+            const scene = new THREE.Scene();
 
-        const controls = new ArcballControls( camera, renderer.domElement, scene );
+            scene.add(line(new THREE.Vector3(0, 0, 0), new THREE.Vector3(3, 0, 0)));
+            scene.add(line(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 3, 0)));
+            scene.add(line(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 3)));
 
-        controls.addEventListener( 'change', function () {
+            scene.add(text(new THREE.Vector3(10,0,0),'XYXYSYSVVXU'));
+
+
+            const sphereGeometry = new THREE.SphereGeometry(0.1,16,8);
+            const sphereMaterial = new THREE.MeshBasicMaterial( { color: 0x800080,wireframe: true } );
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.position.x=0.5;
+            sphere.position.y=0.5;
+            sphere.position.z=0.5;
+            scene.add(sphere);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.zoom=100;
+
+
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            $("#canvas")[0].appendChild(renderer.domElement);
+
+            //const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+            //const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+            //const cube = new THREE.Mesh( geometry, material );
+            //scene.add( cube );
+
+            camera.position.z = 5;
+
+            //const controls = new ArcballControls( camera, renderer.domElement, scene );
+            //const controls = new TrackballControls(camera, renderer.domElement);
+
+            /*controls.addEventListener( 'change', function () {
 
             renderer.render( scene, camera );
 
-        } );
+        } );*/
 
-        function animate() {
-            requestAnimationFrame( animate );
-            renderer.render( scene, camera );
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
+            const controls = createControls(camera);
+
+            function createControls(camera) {
+
+                const controls = new TrackballControls(camera, renderer.domElement);
+
+                controls.rotateSpeed = 1.0;
+                controls.zoomSpeed = 1.2;
+                controls.panSpeed = 0.8;
+
+                controls.keys = ['KeyA', 'KeyS', 'KeyD'];
+
+                return controls;
+            }
+            /*
+        initGeometries();
+        function initGeometries() {
+
+            geometries = [
+                new THREE.SphereGeometry(1.0, 16, 8),
+            ];
         }
-        animate();
-/*
+        */
+
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+                //cube.rotation.x += 0.01;
+                //cube.rotation.y += 0.01;
+            }
+
+            animate();
+            /*
         //alert("Ready");
         const canvas = $('#canvas')[0];
         const context = canvas.getContext("2d");
@@ -110,7 +188,7 @@
         context.fill();
 */
 
-    });
+        });
 
 </script>
 <body>
@@ -123,11 +201,11 @@
     </table>
     <table>
         <tr><td>Vx:</td><td><input id="Vx" size="5"></input></td>
-        <td>Vy:</td><td><input id="Vy" size="5"></input></td>
+            <td>Vy:</td><td><input id="Vy" size="5"></input></td>
             <td>Vz:</td><td><input id="Vz" size="5"></input></td></tr>
-        <tr><td>X0:</td><td><input id="X0" size="5"></input></td>
-            <td>Y0:</td><td><input id="Y0" size="5"></input></td>
-            <td>Z0:</td><td><input id="Z0" size="5"></input></td></tr>
+        <tr><td>X0:</td><td><input id="X0" size="5" value="5"></input></td>
+            <td>Y0:</td><td><input id="Y0" size="5" value="5"></input></td>
+            <td>Z0:</td><td><input id="Z0" size="5" value="5"></input></td></tr>
     </table>
 
         <button type="button" id="start">Запуск</button>
